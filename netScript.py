@@ -3,37 +3,27 @@ from mininet.topo import Topo
 from mininet.node import CPULimitedHost, RemoteController
 from mininet.log import setLogLevel, info
 from mininet.cli import CLI
+from mininet.link import TCLink
 
-class SimplePktSwitch(Topo):
-	def __init__(self):
-#		SimplePktSwitch.__init__(self)
+class myTopo(Topo):
+	def __init__(self, **opts):
+		super (myTopo, self).__init__(**opts)
 		#Create Hosts
-		h1=self.addHost('h1')
-		h1=self.addHost('h2')
-		h1=self.addHost('h3')
-		h1=self.addHost('h4')
+		h1=self.addHost('h1', ip='169.0.10.3/24')
+		h2=self.addHost('h2', ip='169.0.10.4/24')
+		h3=self.addHost('h3', ip='169.0.10.5/24')
+		h4=self.addHost('h4', ip='169.0.10.6/24')
 
 		#Create Switchs
 		s1=self.addSwitch('s1')
-		s1=self.addSwitch('s2')
-		s1=self.addSwitch('s3')
+		s2=self.addSwitch('s2')
+		s3=self.addSwitch('s3')
 
 		#Create Links
-		self.addLink('h1', 's2')
-		self.addLink('h2', 's2')
-		self.addLink('h3', 's3')
-		self.addLink('h4', 's3')
-		self.addLink('s2', 's1')
-		self.addLink('s3', 's1')
-
-def run():
-	c = RemoteController('c', '127.0.0.1', 6633)
-	net = Mininet(topo=SimplePktSwitch(), host=CPULimitedHost, controller=None)
-	net.addController(c)
-	net.start()
-	CLI(net)
-	net.stop()
-
-if __name__=='__main__':
-	setLogLevel('info')
-	run()
+		self.addLink('h1', 's2', cls=TCLink, bw=1000, delay='1ms')
+		self.addLink('h2', 's2', cls=TCLink, bw=1000, delay='1ms')
+		self.addLink('h3', 's3', cls=TCLink, bw=1000, delay='1ms')
+		self.addLink('h4', 's3', cls=TCLink, bw=1000, delay='1ms')
+		self.addLink('s2', 's1', cls=TCLink, bw=100, delay='100ms')
+		self.addLink('s3', 's1', cls=TCLink, bw=100, delay='100ms')
+topos = {'myTopo' : (lambda : myTopo())}
